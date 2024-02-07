@@ -30,12 +30,14 @@ void ACityPlayerController::SetupInputComponent()
 		InputComponent->BindAxis("MoveForward", this, &ACityPlayerController::MoveForward);
 		InputComponent->BindAxis("MoveRight", this, &ACityPlayerController::MoveRight);
 		InputComponent->BindAxis("Scroll", this, &ACityPlayerController::HandleMouseScroll);
-		InputComponent->BindAxis("MouseX", this, &ACityPlayerController::HandleMouseTurn);
-		InputComponent->BindAxis("MouseY", this, &ACityPlayerController::HandleMouseLookUp);
+		InputComponent->BindAxis("MouseX", this, &ACityPlayerController::MouseMoveX);
+		InputComponent->BindAxis("MouseY", this, &ACityPlayerController::MouseMoveY);
 		InputComponent->BindAction("MiddleMouseClick", IE_Pressed, this, &ACityPlayerController::ToggleMiddleMouseClick);
 		InputComponent->BindAction("MiddleMouseClick", IE_Released, this, &ACityPlayerController::ToggleMiddleMouseClick);
 		InputComponent->BindAction("RightMouseClick", IE_Pressed, this, &ACityPlayerController::HandleRightMouseClick);
 		InputComponent->BindAction("LeftMouseClick", IE_Pressed, this, &ACityPlayerController::HandleLeftMouseClick);
+		InputComponent->BindAction("PressE", IE_Pressed, this, &ACityPlayerController::EKeyPressed);
+		InputComponent->BindAction("PressQ", IE_Pressed, this, &ACityPlayerController::QKeyPressed);
 	}
 }
 
@@ -74,16 +76,19 @@ void ACityPlayerController::HandleMouseScroll(float Value)
 	}
 }
 
-void ACityPlayerController::HandleMouseTurn(float Value)
+void ACityPlayerController::MouseMoveX(float Value)
 {
+	// handle camera rotation
 	if (bMiddleMouseIsPressed && CityCharacter)
 	{
 		AddYawInput(Value * CameraRotationSpeed);
 	}
+	//TODO: signal Builder that mouse is moving in X
 }
 
-void ACityPlayerController::HandleMouseLookUp(float Value)
+void ACityPlayerController::MouseMoveY(float Value)
 {
+	// handle camera pitch changes
 	if (bMiddleMouseIsPressed && CityCharacter)
 	{
 		if (USpringArmComponent* SpringArmComp = CityCharacter->GetSpringArmComp())
@@ -94,6 +99,7 @@ void ACityPlayerController::HandleMouseLookUp(float Value)
 			SpringArmComp->SetWorldRotation(FRotator(Value, SpringArmComp->GetComponentRotation().Yaw, SpringArmComp->GetComponentRotation().Roll));
 		}
 	}
+	//TODO signal Builder that mouse is moving in Y
 }
 
 
@@ -104,33 +110,40 @@ void ACityPlayerController::ToggleMiddleMouseClick()
 
 void ACityPlayerController::HandleRightMouseClick()
 {
-	if (UGameInstance* GameInstance = GetGameInstance())
+	if (Builder && Builder->IsPlacementModeEnabled())
 	{
-		if (UBuilderSubsystem* Builder = GameInstance->GetSubsystem<UBuilderSubsystem>())
+		Builder->CancelPlaceBuilding();
+	}
+	else if (ACityHUD* Hud = GetHUD<ACityHUD>())
+	{
+		if (Hud->IsPlacementUIOpen())
 		{
-			if (Builder->IsPlacementModeEnabled())
-			{
-				Builder->CancelPlaceBuilding();
-			}
-			else if (ACityHUD* Hud = GetHUD<ACityHUD>())
-			{
-				if (Hud->IsPlacementUIOpen())
-				{
-					Hud->ClosePlacementUI();
-				}
-			}
+			Hud->ClosePlacementUI();
 		}
 	}
 }
 
 void ACityPlayerController::HandleLeftMouseClick()
 {
-	if (UGameInstance* GameInstance = GetGameInstance())
+	if (Builder)
 	{
-		if (UBuilderSubsystem* Builder = GameInstance->GetSubsystem<UBuilderSubsystem>())
-		{
-			Builder->PlaceBuilding();
-		}
+		Builder->PlaceBuilding();
+	}
+}
+
+void ACityPlayerController::EKeyPressed()
+{
+	if (Builder)
+	{
+		Builder->RotateBuilding(90.0f);
+	}
+}
+
+void ACityPlayerController::QKeyPressed()
+{
+	if (Builder)
+	{
+		Builder->RotateBuilding(-90.0f);
 	}
 }
 
@@ -139,4 +152,9 @@ void ACityPlayerController::SetPawn(APawn* InPawn)
 	Super::SetPawn(InPawn);
 	// to avoid casting in input methods and improve performance a bit
 	CityCharacter = GetPawn<ACityCharacter>();
+	// hold a reference to the BuilderSubsystem
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		Builder = GI->GetSubsystem<UBuilderSubsystem>();
+	}
 }

@@ -37,6 +37,9 @@ protected:
 
 	UPROPERTY()
 		class ACityCharacter* CityCharacter;
+	UPROPERTY()
+		class UBuilderSubsystem* Builder;
+
 	virtual void SetupInputComponent() override;
 	void SetPawn(APawn* InPawn) final;
 
@@ -44,9 +47,11 @@ protected:
 	void MoveForward(float Value);
 	void MoveRight(float Value);
 	void HandleMouseScroll(float Value);
-	void HandleMouseTurn(float Value);
-	void HandleMouseLookUp(float Value);
+	void MouseMoveX(float Value);
+	void MouseMoveY(float Value);
 	void ToggleMiddleMouseClick();
 	void HandleRightMouseClick();
 	void HandleLeftMouseClick();
+	void EKeyPressed();
+	void QKeyPressed();
 };

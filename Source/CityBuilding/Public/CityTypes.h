@@ -20,7 +20,9 @@ enum class EBuildingType : uint8
 	Cube,
 	Cone,
 	Cylinder,
-	Thing
+	Thing,
+	House1,
+	House2
 	// etc..
 };
 

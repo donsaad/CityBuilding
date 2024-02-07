@@ -94,3 +94,11 @@ void UBuilderSubsystem::PlaceBuilding()
 		}
 	}
 }
+
+void UBuilderSubsystem::RotateBuilding(const float Angle)
+{
+	if (bPlacementModeEnabled && PlaceableActor)
+	{
+		PlaceableActor->AddActorWorldRotation(FRotator(0.0f, Angle, 0.0f));
+	}
+}

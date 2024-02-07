@@ -9,12 +9,16 @@
 ACityGameModeBase::ACityGameModeBase(const FObjectInitializer& OI) : Super(OI)
 {
 	VisitorSpawnRate = 3.0f;
+	MidPoint = FVector::ZeroVector;
 }
 
 void ACityGameModeBase::NotifyBuildingPlaced(APlaceableActor* const NewlyPlacedBuilding)
 {
 	if (!NewlyPlacedBuilding)
+	{
+		UE_LOG(LogTemp, Error, TEXT("ACityGameModeBase::NotifyBuildingPlaced Error "));
 		return;
+	}
 
 	// save to current list
 	PlacedBuildings.Add(NewlyPlacedBuilding);
@@ -43,8 +47,6 @@ void ACityGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
 	PlacedBuildings.Reserve(10);
-	// spawn a visitor at start
-	SpawnVisitor();
 
 	FTimerHandle TempTimerHandle;
 	GetWorldTimerManager().SetTimer(TempTimerHandle, this, &ACityGameModeBase::SpawnVisitor, VisitorSpawnRate, true);
@@ -59,6 +61,13 @@ void ACityGameModeBase::SpawnVisitor()
 		if (Visitor)
 		{
 			Visitors.Add(Visitor);
+			if (AVisitorAIController* AIC = Visitor->GetController<AVisitorAIController>())
+			{
+				if (UBlackboardComponent* BBComp = AIC->GetBlackboardComponent())
+				{
+					BBComp->SetValueAsVector("MidpointLocation", MidPoint);
+				}
+			}
 		}
 	}
 }

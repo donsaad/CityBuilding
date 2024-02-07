@@ -23,8 +23,8 @@ public:
 		void SetPlacementUIOpen(bool bOpened) { bIsPlacementUIOpen = bOpened; }
 protected:
 
-	UPROPERTY(BlueprintReadWrite)
-		UUserWidget* GameHudWidget;
+	//UPROPERTY(BlueprintReadWrite)
+		//UUserWidget* GameHudWidget;
 
 	//UPROPERTY(EditDefaultsOnly)
 	//	TSubclassOf<UUserWidget> HudTemplate;

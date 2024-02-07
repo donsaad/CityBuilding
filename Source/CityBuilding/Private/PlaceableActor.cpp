@@ -1,8 +1,8 @@
 
 #include "PlaceableActor.h"
 #include "CityTypes.h"
-#include "PlaceableStaticMeshComp.h"
 #include "PlaceableBoxComponent.h"
+#include "BuilderSubsystem.h"
 
 APlaceableActor::APlaceableActor()
 {
@@ -11,6 +11,11 @@ APlaceableActor::APlaceableActor()
 
 APlaceableActor::APlaceableActor(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
+	DefaultSceneComp = CreateDefaultSubobject<USceneComponent>("RootSceneComp");
+	if (DefaultSceneComp)
+	{
+		SetRootComponent(DefaultSceneComp);
+	}
 	BoxCollision = CreateDefaultSubobject<UPlaceableBoxComponent>("BoxCollision");
 	if (BoxCollision)
 	{
@@ -18,7 +23,7 @@ APlaceableActor::APlaceableActor(const FObjectInitializer& ObjectInitializer) : 
 		BoxCollision->SetGenerateOverlapEvents(true);
 		BoxCollision->bDynamicObstacle = true;
 		BoxCollision->CanCharacterStepUpOn = ECB_No;
-		RootComponent = BoxCollision;
+		BoxCollision->SetupAttachment(RootComponent);
 	}
 	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>("StaticMeshComp");
 	if (StaticMeshComp)
@@ -30,11 +35,17 @@ APlaceableActor::APlaceableActor(const FObjectInitializer& ObjectInitializer) : 
 	}
 
 	BuildingState = EPlacementState::Created;
-
 }
 
 void APlaceableActor::NotifyActorOnClicked(FKey ButtonPressed /*= EKeys::LeftMouseButton*/)
 {
+	if (UBuilderSubsystem* Builder = GetGameInstance()->GetSubsystem<UBuilderSubsystem>())
+	{
+		if (Builder->IsPlacementModeEnabled())
+		{
+			return;
+		}
+	}
 	if (StaticMeshComp && BuildingState == EPlacementState::Placed)
 	{
 		UMaterialInterface* MeshMat = StaticMeshComp->GetMaterial(0);
@@ -62,17 +73,24 @@ void APlaceableActor::NotifyActorBeginOverlap(AActor* OtherActor)
 		{
 			StaticMeshComp->SetOverlayMaterial(InvalidPlacementMaterial);
 		}
+		GEngine->AddOnScreenDebugMessage(INDEX_NONE, 7.0f, FColor::Emerald, FString::Printf(TEXT("*** %s"), *OtherActor->GetName()));
 	}
 	Super::NotifyActorBeginOverlap(OtherActor);
 }
 
 void APlaceableActor::NotifyActorEndOverlap(AActor* OtherActor)
 {
-	if (BuildingState != EPlacementState::Placed)
+	if (StaticMeshComp)
 	{
-		BuildingState = EPlacementState::BeingPlacedValid;
-		if (StaticMeshComp)
+		/* handle overlapping multiple actors at the same time */
+		TArray<AActor*>outActors;
+		StaticMeshComp->GetOverlappingActors(outActors);
+		//const bool bNoOtherOverlaps = (StaticMeshComp->GetOverlapInfos().Num() == 0);
+		if (outActors.Num() == 0 && BuildingState != EPlacementState::Placed)
 		{
+			GEngine->AddOnScreenDebugMessage(INDEX_NONE, 7.0f, FColor::Red, FString::Printf(TEXT("**END* %s"), *OtherActor->GetName()));
+
+			BuildingState = EPlacementState::BeingPlacedValid;
 			StaticMeshComp->SetOverlayMaterial(ValidPlacementMaterial);
 		}
 	}
@@ -95,10 +113,6 @@ void APlaceableActor::PlaceBuilding()
 	{
 		StaticMeshComp->SetOverlayMaterial(nullptr);
 	}
-	//if (PlaceableStaticMesh)
-	//{
-		// TODO: change material opacity visuals
-	//}
 }
 
 void APlaceableActor::MarkAsBeingPlaced()
@@ -114,5 +128,9 @@ bool APlaceableActor::IsPlaced() const
 void APlaceableActor::BeginPlay()
 {
 	Super::BeginPlay();
-
+	// set overlay as valid be default
+	if (StaticMeshComp)
+	{
+		StaticMeshComp->SetOverlayMaterial(ValidPlacementMaterial);
+	}
 }

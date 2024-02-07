@@ -19,11 +19,11 @@ ACityPawn::ACityPawn(const FObjectInitializer& ObjectInitializer) : Super(Object
 		CollisionComp->SetCollisionProfileName(UCollisionProfile::Pawn_ProfileName);
 		CollisionComp->SetCanEverAffectNavigation(false);
 		RootComponent = CollisionComp;
-	}
-	MovementComp = CreateDefaultSubobject<UPawnMovementComponent, UFloatingPawnMovement>("MovementComp");
-	if (MovementComp)
-	{
-		MovementComp->UpdatedComponent = CollisionComp;
+		MovementComp = CreateDefaultSubobject<UPawnMovementComponent, UFloatingPawnMovement>("MovementComp");
+		if (MovementComp)
+		{
+			MovementComp->UpdatedComponent = CollisionComp;
+		}
 	}
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>("SpringArmComp");
 	if (SpringArmComp)

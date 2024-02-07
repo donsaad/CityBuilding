@@ -22,10 +22,10 @@ void ACityHUD::BeginPlay()
 	Super::BeginPlay();
 	//if (HudTemplate)
 	//{
-		//GameHudWidget = CreateWidget<UUserWidget>(HudTemplate);
-		//if (GameHudWidget)
-		//{
-		//	GameHudWidget->AddToViewport();
-		//}
+	//	GameHudWidget = CreateWidget<UUserWidget>(GetOwningPlayerController(), HudTemplate);
+	//	if (GameHudWidget)
+	//	{
+	//		GameHudWidget->AddToViewport();
+	//	}
 	//}
 }

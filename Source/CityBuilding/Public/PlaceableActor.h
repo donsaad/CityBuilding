@@ -29,9 +29,11 @@ public:
 protected:
 
 	UPROPERTY(VisibleAnywhere)
+		USceneComponent* DefaultSceneComp;
+	UPROPERTY(VisibleAnywhere)
 		class UStaticMeshComponent* StaticMeshComp;
 	UPROPERTY(VisibleAnywhere)
-	class UPlaceableBoxComponent* BoxCollision;
+		class UPlaceableBoxComponent* BoxCollision;
 
 	EPlacementState BuildingState;
 

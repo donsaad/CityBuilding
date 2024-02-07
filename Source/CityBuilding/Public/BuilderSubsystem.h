@@ -33,6 +33,8 @@ public:
 	void UpdatePlacement();
 	void PlaceBuilding();
 	bool IsPlacementModeEnabled() const { return bPlacementModeEnabled; }
+	void RotateBuilding(const float Angle);
+
 protected:
 
 	bool bPlacementModeEnabled;
