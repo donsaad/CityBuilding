@@ -16,8 +16,7 @@ class CITYBUILDING_API UCityGameInstance : public UGameInstance
 public:
 
 	TSubclassOf<APlaceableActor> GetBuildingTemplate(const EBuildingType BuildingType) const;
-	UFUNCTION(BlueprintCallable)
-		void GetAvailableBuildingTypes(TArray<EBuildingType>& OutBuildingTypes);
+	void GetAvailableBuildingTypes(TArray<EBuildingType>& OutBuildingTypes);
 protected:
 
 	UPROPERTY(EditDefaultsOnly)

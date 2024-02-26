@@ -6,6 +6,7 @@
 #include "CityHUD.generated.h"
 
 class UUserWidget;
+class UGameHudWidget;
 
 UCLASS()
 class CITYBUILDING_API ACityHUD : public AHUD
@@ -17,17 +18,15 @@ public:
 	ACityHUD(const FObjectInitializer& ObjectInitializer);
 	bool IsPlacementUIOpen() const { return bIsPlacementUIOpen; }
 
-	UFUNCTION(BlueprintNativeEvent)
-		void ClosePlacementUI();
-	UFUNCTION(BlueprintCallable)
-		void SetPlacementUIOpen(bool bOpened) { bIsPlacementUIOpen = bOpened; }
+	void ClosePlacementUI();
+	void SetPlacementUIOpen(const bool bOpened) { bIsPlacementUIOpen = bOpened; }
 protected:
 
-	//UPROPERTY(BlueprintReadWrite)
-		//UUserWidget* GameHudWidget;
+	UPROPERTY(BlueprintReadWrite)
+		UGameHudWidget* GameHudWidget;
 
-	//UPROPERTY(EditDefaultsOnly)
-	//	TSubclassOf<UUserWidget> HudTemplate;
+	UPROPERTY(EditDefaultsOnly)
+		TSubclassOf<UGameHudWidget> HudTemplate;
 
 	UPROPERTY(BlueprintReadWrite)
 		bool bIsPlacementUIOpen;

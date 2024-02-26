@@ -12,11 +12,11 @@ ACityGameModeBase::ACityGameModeBase(const FObjectInitializer& OI) : Super(OI)
 	MidPoint = FVector::ZeroVector;
 }
 
-void ACityGameModeBase::NotifyBuildingPlaced(APlaceableActor* const NewlyPlacedBuilding)
+void ACityGameModeBase::NotifyBuildingPlaced(const APlaceableActor* const NewlyPlacedBuilding)
 {
 	if (!NewlyPlacedBuilding)
 	{
-		UE_LOG(LogTemp, Error, TEXT("ACityGameModeBase::NotifyBuildingPlaced Error "));
+		UE_LOG(LogTemp, Error, TEXT("ACityGameModeBase::NotifyBuildingPlaced Error: New building is not valid."));
 		return;
 	}
 

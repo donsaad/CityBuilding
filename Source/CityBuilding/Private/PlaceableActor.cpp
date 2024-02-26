@@ -73,23 +73,18 @@ void APlaceableActor::NotifyActorBeginOverlap(AActor* OtherActor)
 		{
 			StaticMeshComp->SetOverlayMaterial(InvalidPlacementMaterial);
 		}
-		GEngine->AddOnScreenDebugMessage(INDEX_NONE, 7.0f, FColor::Emerald, FString::Printf(TEXT("*** %s"), *OtherActor->GetName()));
 	}
 	Super::NotifyActorBeginOverlap(OtherActor);
 }
 
 void APlaceableActor::NotifyActorEndOverlap(AActor* OtherActor)
 {
-	if (StaticMeshComp)
+	if (BoxCollision)
 	{
 		/* handle overlapping multiple actors at the same time */
-		TArray<AActor*>outActors;
-		StaticMeshComp->GetOverlappingActors(outActors);
-		//const bool bNoOtherOverlaps = (StaticMeshComp->GetOverlapInfos().Num() == 0);
-		if (outActors.Num() == 0 && BuildingState != EPlacementState::Placed)
+		const bool bNoOtherOverlaps = (BoxCollision->GetOverlapInfos().Num() == 0);
+		if (bNoOtherOverlaps && BuildingState != EPlacementState::Placed)
 		{
-			GEngine->AddOnScreenDebugMessage(INDEX_NONE, 7.0f, FColor::Red, FString::Printf(TEXT("**END* %s"), *OtherActor->GetName()));
-
 			BuildingState = EPlacementState::BeingPlacedValid;
 			StaticMeshComp->SetOverlayMaterial(ValidPlacementMaterial);
 		}

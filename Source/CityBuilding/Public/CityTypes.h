@@ -34,3 +34,9 @@ enum class EBuilderMode : uint8
 	Off,
 	// etc..
 };
+
+static FString GetEnumString(const FString& EnumName, const int32 Value)
+{
+	UEnum* Enum = FindFirstObjectSafe<UEnum>(*EnumName);
+	return Enum ? Enum->GetNameStringByIndex(static_cast<uint8>(Value)) : TEXT("null");
+}

@@ -14,12 +14,12 @@ class CITYBUILDING_API ACityGameModeBase : public AGameModeBase
 
 public:
 	ACityGameModeBase(const FObjectInitializer& OI);
-	void NotifyBuildingPlaced(APlaceableActor* const NewlyPlacedBuilding);
+	void NotifyBuildingPlaced(const APlaceableActor* const NewlyPlacedBuilding);
 	void NotifyVisitorReachedDestination(ACharacter* Visitor);
 
 protected:
 
-	TArray<APlaceableActor*> PlacedBuildings;
+	TArray<const APlaceableActor*> PlacedBuildings;
 
 	UPROPERTY(EditAnywhere, Category = "Visitor Settings")
 		FVector VisitorSpawnLocation;
